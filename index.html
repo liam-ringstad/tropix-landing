@@ -5,80 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tropix AI — Shooting for the Stars</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; }
     .glow-cyan { text-shadow: 0 0 40px rgb(0 245 255); }
+    .hero-bg { background: radial-gradient(circle at 50% 30%, rgba(0,245,255,0.08), transparent 70%); }
   </style>
 </head>
-<body class="bg-black text-white">
+<body class="bg-black text-white overflow-x-hidden">
 
-  <!-- NAVBAR -->
-  <nav class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-      <div class="text-2xl font-bold tracking-tighter">Tropix AI</div>
-      <div class="flex items-center gap-8 text-sm font-medium">
+  <!-- NAV -->
+  <nav class="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
+      <div class="text-3xl font-semibold tracking-tighter">Tropix AI</div>
+      <div class="flex gap-10 text-sm font-medium">
         <a href="#vision" class="hover:text-cyan-400 transition">The Vision</a>
         <a href="#demo" class="hover:text-cyan-400 transition">Demo</a>
-        <a href="#beta" class="hover:text-cyan-400 transition">Join Beta</a>
+        <a href="#beta" class="hover:text-cyan-400 transition">Beta</a>
       </div>
     </div>
   </nav>
 
-  <!-- HERO - CLEAN TEXT ONLY -->
-  <section class="min-h-screen flex items-center justify-center relative overflow-hidden">
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,#0a0a0a_0%,#000_70%)]"></div>
-    <div class="relative z-10 text-center px-6 max-w-5xl mx-auto">
-      <h1 class="text-7xl md:text-8xl font-bold tracking-tighter mb-6 glow-cyan">Tropix AI</h1>
-      <p class="text-3xl md:text-5xl font-light tracking-tight mb-12 text-gray-300">
+  <!-- HERO -->
+  <section class="min-h-screen flex items-center justify-center hero-bg pt-20">
+    <div class="max-w-5xl mx-auto text-center px-6">
+      <h1 class="text-7xl md:text-8xl font-semibold tracking-tighter mb-8">Tropix AI</h1>
+      <p class="text-3xl md:text-5xl font-light tracking-tight text-gray-200 mb-16">
         When we say we’re shooting for the stars…<br>
         <span class="text-cyan-400">it’s still a metaphor.</span><br>
         One day we will mean it literally.
       </p>
       <a href="#beta" 
-         class="inline-block bg-cyan-400 hover:bg-cyan-300 text-black font-semibold text-xl px-12 py-6 rounded-2xl transition-all duration-300 hover:scale-105">
+         class="inline-block bg-white text-black font-semibold text-xl px-16 py-6 rounded-2xl hover:bg-cyan-400 transition-all hover:scale-105">
         Join the Private Beta
       </a>
     </div>
   </section>
 
-  <!-- THE VISION - FULL CINEMATIC WITH SOUND -->
-  <section id="vision" class="py-20 bg-zinc-950 border-t border-white/10">
+  <!-- THE VISION -->
+  <section id="vision" class="py-24 bg-zinc-950">
     <div class="max-w-6xl mx-auto px-6 text-center">
-      <h2 class="text-5xl font-bold mb-8">The Vision</h2>
-      <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">The troposphere is the hardest layer for any rocket to escape.<br>That’s where we are in sales today.</p>
+      <h2 class="text-5xl font-semibold mb-6">The Vision</h2>
+      <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-12">The troposphere is the hardest layer for any rocket to escape.<br>That’s exactly where we are in sales today.</p>
       
       <div class="aspect-video bg-black rounded-3xl overflow-hidden mx-auto max-w-5xl shadow-2xl border border-white/10">
         <iframe width="100%" height="100%" 
                 src="https://www.youtube.com/embed/ZjSs5i7cwbk?rel=0&modestbranding=1" 
-                title="Tropix AI — Shooting for the Stars" 
-                frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen>
-        </iframe>
+                frameborder="0" allowfullscreen></iframe>
       </div>
     </div>
   </section>
 
   <!-- BENEFITS -->
   <section class="py-24 bg-black">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="grid md:grid-cols-3 gap-12">
-        <div class="text-center">
-          <div class="text-6xl mb-6">⚡</div>
-          <h3 class="text-2xl font-semibold mb-4">Autonomous Swarms</h3>
-          <p class="text-gray-400">Qualify, personalize, follow up, and book meetings 24/7.</p>
-        </div>
-        <div class="text-center">
-          <div class="text-6xl mb-6">🔗</div>
-          <h3 class="text-2xl font-semibold mb-4">Deep Integrations</h3>
-          <p class="text-gray-400">Salesforce, HubSpot, LinkedIn, Gmail — all connected.</p>
-        </div>
-        <div class="text-center">
-          <div class="text-6xl mb-6">🚀</div>
-          <h3 class="text-2xl font-semibold mb-4">Real ROI This Quarter</h3>
-          <p class="text-gray-400">Not next year. Measurable results fast.</p>
-        </div>
+    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-16">
+      <div>
+        <h3 class="text-2xl font-semibold mb-4">Autonomous Swarms</h3>
+        <p class="text-gray-400">Qualify leads, personalize outreach, handle objections, and book meetings — all without human intervention.</p>
+      </div>
+      <div>
+        <h3 class="text-2xl font-semibold mb-4">Deep Integrations</h3>
+        <p class="text-gray-400">Native connections with Salesforce, HubSpot, LinkedIn, Gmail, and Calendly.</p>
+      </div>
+      <div>
+        <h3 class="text-2xl font-semibold mb-4">Real Results Now</h3>
+        <p class="text-gray-400">Built for sales leaders who need measurable ROI this quarter — not next year.</p>
       </div>
     </div>
   </section>
@@ -86,9 +76,9 @@
   <!-- DEMO -->
   <section id="demo" class="py-24 bg-zinc-950">
     <div class="max-w-6xl mx-auto px-6 text-center">
-      <h2 class="text-5xl font-bold mb-6">See It in Action</h2>
+      <h2 class="text-5xl font-semibold mb-6">See It In Action</h2>
       <p class="text-xl text-gray-400 mb-12">From cold lead to booked meeting in minutes.</p>
-      <div class="aspect-video bg-black rounded-3xl overflow-hidden mx-auto max-w-4xl shadow-2xl">
+      <div class="aspect-video bg-black rounded-3xl overflow-hidden mx-auto max-w-5xl shadow-2xl border border-white/10">
         <iframe width="100%" height="100%" 
                 src="https://www.youtube.com/embed/YOUR_DEMO_VIDEO_ID?rel=0" 
                 frameborder="0" allowfullscreen></iframe>
@@ -99,24 +89,27 @@
   <!-- BETA -->
   <section id="beta" class="py-32 bg-black border-t border-white/10">
     <div class="max-w-2xl mx-auto px-6 text-center">
-      <h2 class="text-6xl font-bold mb-6">Be First in Line</h2>
-      <p class="text-2xl text-gray-300 mb-12">Private beta spots are limited.</p>
+      <h2 class="text-6xl font-semibold mb-6">Be First</h2>
+      <p class="text-2xl text-gray-300 mb-12">Private beta is extremely limited.</p>
+      
+      <!-- Replace this with your actual Google Form embed -->
       <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdOKyomhbIK7Fc5Pc6a8LTMoTb5xmcJM7iOs0ZKOKl2VAjcRQ/viewform?embedded=true" width="640" height="1046" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
     </div>
   </section>
 
   <!-- FOOTER -->
-  <footer class="bg-zinc-950 border-t border-white/10 py-16">
+  <footer class="bg-zinc-950 border-t border-white/10 py-20">
     <div class="max-w-6xl mx-auto px-6 text-center text-sm text-gray-500">
-      <div class="flex justify-center gap-8 mb-8 flex-wrap">
-        <a href="mailto:beta@tropix.ai" class="hover:text-cyan-400">beta@tropix.ai</a>
-        <a href="mailto:support@tropix.ai" class="hover:text-cyan-400">support@tropix.ai</a>
-        <a href="mailto:hello@tropix.ai" class="hover:text-cyan-400">hello@tropix.ai</a>
-        <a href="mailto:sales@tropix.ai" class="hover:text-cyan-400">sales@tropix.ai</a>
-        <a href="mailto:safety@tropix.ai" class="hover:text-cyan-400">safety@tropix.ai</a>
+      <div class="flex flex-wrap justify-center gap-x-10 gap-y-4 mb-12">
+        <a href="mailto:beta@tropix.ai" class="hover:text-white">beta@tropix.ai</a>
+        <a href="mailto:support@tropix.ai" class="hover:text-white">support@tropix.ai</a>
+        <a href="mailto:hello@tropix.ai" class="hover:text-white">hello@tropix.ai</a>
+        <a href="mailto:sales@tropix.ai" class="hover:text-white">sales@tropix.ai</a>
+        <a href="mailto:safety@tropix.ai" class="hover:text-white">safety@tropix.ai</a>
       </div>
       <p>© 2026 Tropix AI • Built to break through the troposphere.</p>
     </div>
   </footer>
+
 </body>
 </html>
