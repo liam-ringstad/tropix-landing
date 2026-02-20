@@ -35,7 +35,9 @@ const containerVariants = {
     }
 };
 
-const cardVariants = {
+import { Variants } from "framer-motion";
+
+const cardVariants: Variants = {
     hidden: { opacity: 0, y: 50 },
     visible: {
         opacity: 1,
