@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPACE Sovereign | Defense-Grade Executive Protection</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --bg-deep: #0a0a0a;
+            --bg-panel: #111111;
+            --bg-surface: #18181b;
+            --border-dim: #27272a;
+            --border-active: #52525b;
+            --text-main: #f5f5f5;
+            --text-dim: #a1a1aa;
+            --accent-red: #ef4444;
+            --accent-red-glow: rgba(239, 68, 68, 0.4);
+            --accent-amber: #fbbf24;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            /* Grid background */
+            --grid-line: rgba(255, 255, 255, 0.03);
+            --grid-size: 40px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: var(--grid-size) var(--grid-size);
+            background-attachment: fixed;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            color: var(--text-main);
+        }
+
+        h1 {
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            letter-spacing: -0.04em;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 2rem;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+        }
+
+        p {
+            color: var(--text-dim);
+            font-size: 1.05rem;
+            max-width: 800px;
+        }
+
+        .mono {
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
+        }
+
+        .text-amber {
+            color: var(--accent-amber);
+        }
+
+        .text-red {
+            color: var(--accent-red);
+        }
+
+        /* --- ENTRANCE ANIMATION (SECURE BOOT) --- */
+        #entrance-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #050505; z-index: 10000;
+            display: flex; justify-content: center; align-items: center; overflow: hidden;
+        }
+
+        #entrance-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+
+        #terminal-boot {
+            position: absolute; top: 40px; left: 40px;
+            font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);
+            line-height: 1.5; opacity: 0.8; pointer-events: none; z-index: 10002;
+            text-align: left; white-space: pre-wrap; text-shadow: 0 0 5px rgba(255,255,255,0.1);
+        }
+
+        .isr-hud {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10001;
+        }
+
+        #center-ring {
+            width: 350px; height: 350px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 50%; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.8); opacity: 0;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+        }
+
+        #isr-text-container {
+            position: absolute; bottom: 20%; text-align: center;
+        }
+
+        #skip-btn {
+            position: absolute; bottom: 40px; right: 40px; z-index: 10003;
+            background: rgba(0, 0, 0, 0.5); border: 1px solid var(--border-active);
+            color: var(--text-dim); padding: 0.5rem 1.5rem;
+            cursor: pointer; opacity: 0; pointer-events: none;
+            transition: opacity 0.5s ease, color 0.3s, border-color 0.3s;
+            backdrop-filter: blur(4px);
+        }
+
+        #skip-btn.visible { opacity: 1; pointer-events: auto; }
+        #skip-btn:hover { color: var(--text-main); border-color: var(--text-main); }
+
+
+        /* --- MAIN PAGE LAYOUT --- */
+        #main-content {
+            opacity: 0;
+            /* Revealed by GSAP after entrance */
+            visibility: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(180deg, rgba(10, 10, 10, 0.9) 0%, rgba(10, 10, 10, 0) 100%);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-mark {
+            width: 12px;
+            height: 12px;
+            background-color: var(--accent-red);
+            display: inline-block;
+            box-shadow: 0 0 10px var(--accent-red-glow);
+        }
+
+        .nav-status {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-status span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--accent-amber);
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+        }
+
+        section {
+            padding: 8rem 4rem;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Layout Helpers */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border: 1px solid var(--border-active);
+            border-radius: 2px;
+            margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(4px);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--text-main);
+            color: var(--bg-deep);
+            padding: 1rem 2.5rem;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        .btn:hover {
+            background-color: #d4d4d8;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-active);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-main);
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        /* --- HERO SECTION --- */
+        #hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Hero Background Canvas */
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        #hero h1 {
+            margin-bottom: 1.5rem;
+        }
+
+        #hero p.subtitle {
+            font-size: clamp(1.2rem, 2vw, 1.5rem);
+            color: var(--text-main);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        #hero p.tagline {
+            color: var(--text-dim);
+            margin-bottom: 3rem;
+            border-left: 2px solid var(--accent-red);
+            padding-left: 1rem;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-disclaimer {
+            margin-top: 3rem;
+            opacity: 0.6;
+        }
+
+        /* --- INFO SECTIONS --- */
+        .section-header {
+            margin-bottom: 4rem;
+            max-width: 800px;
+        }
+
+        .large-p {
+            font-size: 1.25rem;
+            line-height: 1.8;
+            color: var(--text-main);
+        }
+
+        /* --- CAPABILITIES GRID --- */
+        .capability-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-dim);
+            padding: 2.5rem;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-red), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            transform: translateX(-100%);
+        }
+
+        .card:hover {
+            border-color: var(--border-active);
+            background-color: var(--bg-surface);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.8);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+            transform: translateX(0);
+            transition: all 0.6s ease;
+        }
+
+        /* Sublte red glow effect inside card */
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, var(--accent-red-glow) 0%, transparent 70%);
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            filter: blur(40px);
+        }
+
+        .card:hover::after {
+            opacity: 0.15;
+        }
+
+        .card-icon {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        .icon-box {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-dim);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card-number {
+            color: var(--border-active);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        /* --- TWO COL LAYOUT --- */
+        .split-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .split-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .bullet-list {
+            list-style: none;
+        }
+
+        .bullet-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-dim);
+        }
+
+        .bullet-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.6rem;
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-red);
+        }
+
+        .visual-box {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-dim);
+            aspect-ratio: 4/3;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* decorative UI lines inside visual box */
+        .ui-decorator {
+            position: absolute;
+            border: 1px solid var(--border-active);
+        }
+
+        .ui-tl {
+            top: 20px;
+            left: 20px;
+            width: 20px;
+            height: 20px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .ui-tr {
+            top: 20px;
+            right: 20px;
+            width: 20px;
+            height: 20px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .ui-bl {
+            bottom: 20px;
+            left: 20px;
+            width: 20px;
+            height: 20px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .ui-br {
+            bottom: 20px;
+            right: 20px;
+            width: 20px;
+            height: 20px;
+            border-left: none;
+            border-top: none;
+        }
+
+        /* --- CTA SECTION --- */
+        #cta {
+            border-top: 1px solid var(--border-dim);
+            background: linear-gradient(180deg, var(--bg-deep) 0%, #050505 100%);
+            text-align: center;
+        }
+
+        #cta .container {
+            max-width: 600px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-dim);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: var(--text-dim);
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            padding: 3rem 4rem;
+            border-top: 1px solid var(--border-dim);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            background-color: #050505;
+        }
+
+        .footer-left p {
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-legal {
+            font-size: 0.75rem;
+            color: #52525b;
+            max-width: 400px;
+        }
+
+        /* GSAP Utility Classes */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+
+            header,
+            section,
+            footer {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+
+            .split-section {
+                grid-template-columns: 1fr;
+            }
+
+            footer {
+                flex-direction: column;
+                gap: 2rem;
+                align-items: flex-start;
+            }
+
+            .nav-status {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ENTRANCE ANIMATION OVERLAY -->
+    <div id="entrance-overlay">
+        <canvas id="entrance-canvas"></canvas>
+
+        <div id="terminal-boot" class="mono"></div>
+
+        <div class="isr-hud" id="isr-hud">
+            <div id="center-ring"></div>
+            <div id="isr-text-container">
+                <div class="mono" id="isr-status-text" style="color: var(--text-dim); letter-spacing: 0.2rem; font-size: 0.9rem;">INITIATING SECURE HANDSHAKE...</div>
+                <div class="mono" id="isr-threat-text" style="display: none; margin-top: 10px; font-size: 1.2rem; letter-spacing: 0.3rem;">[ ONTOLOGY UPLINK ESTABLISHED ]</div>
+            </div>
+        </div>
+
+        <button id="skip-btn" class="mono">SKIP [ENTER]</button>
+    </div>
+
+    <!-- MAIN PAGE CONTENT -->
+    <div id="main-content">
+
+        <header>
+            <div class="logo">
+                <span class="logo-mark"></span>
+                EPACE SOVEREIGN
+            </div>
+            <div class="nav-status mono text-dim">
+                <span>ONTOLOGY_SYNC <span class="text-amber">SECURE</span></span>
+                <span>
+                    <div class="status-indicator"></div> AIRGAPPED [OP_NOR]
+                </span>
+            </div>
+        </header>
+
+        <!-- HERO SECTION -->
+        <section id="hero">
+            <canvas id="hero-canvas"></canvas>
+            <div class="container reveal-up" style="position: relative; z-index: 2;">
+                <span class="badge mono">PALANTIR AIP + GROK FUSED</span>
+                <h1>EPACE Sovereign</h1>
+                <p class="subtitle">Sovereign Executive Protection for the World’s Most Important Principals</p>
+                <p class="tagline">Offline-first. Military-grade. Built for the missions that cannot fail.</p>
+
+                <div class="cta-group">
+                    <a href="mailto:hello@tropix.ai" class="btn">Request Early Access</a>
+                    <a href="#what-is" class="btn btn-outline" style="border:none; padding-left:1rem;">Access Briefing
+                        &darr;</a>
+                </div>
+
+                <div class="hero-disclaimer mono">
+                    [ ! ] CURRENTLY IN ADVANCED DEVELOPMENT — PARTNERING WITH FORWARD-THINKING INSTITUTIONS AND DEFENSE
+                    ORGANIZATIONS.
+                </div>
+            </div>
+        </section>
+
+        <!-- WHAT IS EPACE SECTION -->
+        <section id="what-is">
+            <div class="container reveal-up">
+                <div class="section-header">
+                    <span class="badge mono text-dim"
+                        style="border:none; padding:0; background:none; margin-bottom:1rem;">MISSION OVERVIEW</span>
+                    <h2>A sovereign, air-gapped command system.</h2>
+                    <p class="large-p">Turns raw Protective Security Operations Plans into a live “Eye of God” platform.
+                        Gives agents delta-force awareness while enforcing ironclad Rules of Engagement and full
+                        human-in-the-loop controls. Designed for high-profile global travel through high-risk zones and
+                        scaling toward defense contracts.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CAPABILITIES SECTION -->
+        <section id="capabilities" style="border-top: 1px solid var(--border-dim); background-color: #0d0d0d;">
+            <div class="container reveal-up">
+                <div class="section-header">
+                    <span class="badge mono text-dim"
+                        style="border:none; padding:0; background:none; margin-bottom:1rem;">ARCHITECTURE &
+                        DEPLOYMENT</span>
+                    <h2>Core Capabilities</h2>
+                </div>
+
+                <div class="capability-grid">
+                    <!-- Card 1 -->
+                    <div class="card reveal-up">
+                        <div class="card-icon">
+                            <div class="icon-box">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </div>
+                            <span class="mono card-number">01</span>
+                        </div>
+                        <h3>Eye of God ReconFusion</h3>
+                        <p>Real-time ontology map fusing thousands of diverse intelligence streams. Anticipates and
+                            visualizes physical threats before they breach the perimeter.</p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="card reveal-up">
+                        <div class="card-icon">
+                            <div class="icon-box">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                            </div>
+                            <span class="mono card-number">02</span>
+                        </div>
+                        <h3>PSOP Ingestion & Automation</h3>
+                        <p>Raw protective security plans transform into a fully seeded, living operational system in
+                            seconds. Zero manual topography mapping required.</p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="card reveal-up">
+                        <div class="card-icon">
+                            <div class="icon-box">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5">
+                                    <rect x="2" y="7" width="20" height="10" rx="2" ry="2"></rect>
+                                    <path d="M12 11h.01"></path>
+                                    <path d="M8 11h.01"></path>
+                                    <path d="M16 11h.01"></path>
+                                </svg>
+                            </div>
+                            <span class="mono card-number">03</span>
+                        </div>
+                        <h3>Smart Glasses AR</h3>
+                        <p>FieldAugmentAgent overlays active threat icons, localized ROE parameters, and enables
+                            gaze-based duress signaling directly onto tactical eyewear.</p>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="card reveal-up">
+                        <div class="card-icon">
+                            <div class="icon-box">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                </svg>
+                            </div>
+                            <span class="mono card-number">04</span>
+                        </div>
+                        <h3>ROE Coordinator</h3>
+                        <p>Enforces strict Rules of Engagement at machine speed. Ensures every decision is legally
+                            sound, producing an immutable audit trail for defense contracts.</p>
+                    </div>
+
+                    <!-- Card 5 -->
+                    <div class="card reveal-up">
+                        <div class="card-icon">
+                            <div class="icon-box">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5">
+                                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                    <polyline points="2 17 12 22 22 17"></polyline>
+                                    <polyline points="2 12 12 17 22 12"></polyline>
+                                </svg>
+                            </div>
+                            <span class="mono card-number">05</span>
+                        </div>
+                        <h3>Palantir AIP-Compatible</h3>
+                        <p>Powered by a local-first ontology graph. Seamlessly synchronize with enterprise architectures
+                            or remain completely isolated in sovereign namespaces.</p>
+                    </div>
+
+                    <!-- Card 6 -->
+                    <div class="card reveal-up">
+                        <div class="card-icon">
+                            <div class="icon-box">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                                </svg>
+                            </div>
+                            <span class="mono card-number">06</span>
+                        </div>
+                        <h3>Air-Gapped Readiness</h3>
+                        <p>Engineered for the Apollo computing edge. Fully functional mapping, reasoning, and command
+                            synchronization in hostile, low-bandwidth warzones.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- BUILT FOR THE HIGHEST STAKES (Split Section) -->
+        <section id="highest-stakes">
+            <div class="container reveal-up">
+                <div class="split-section">
+                    <div class="split-content">
+                        <span class="badge mono text-dim"
+                            style="border:none; padding:0; background:none; margin-bottom:1rem;">OPERATIONAL
+                            THRESHOLD</span>
+                        <h2>Built for the Highest Stakes</h2>
+                        <p class="large-p" style="font-size: 1.1rem; color: var(--text-dim); margin-bottom: 2.5rem;">
+                            Protecting principals at the level of the World Bank Group President and scaling to
+                            Department of Defense and War contracts. Every decision auditable, every action inside
+                            strict ROE + two independent confirmations + HITL for lethal force.</p>
+
+                        <h3 style="margin-bottom: 1rem; color: var(--text-main);">Why Partners Choose Us</h3>
+                        <ul class="bullet-list">
+                            <li>Maximum sovereignty and offline-first design</li>
+                            <li>Palantir AIP + Grok fusion for unmatched reasoning and data power</li>
+                            <li>Ironclad compliance and immutable lineage</li>
+                            <li>Self-improving architecture that evolves with new threats and capabilities</li>
+                            <li>Ready for the missions that matter most</li>
+                        </ul>
+                    </div>
+
+                    <div class="split-visual">
+                        <div class="visual-box">
+                            <div class="ui-decorator ui-tl"></div>
+                            <div class="ui-decorator ui-tr"></div>
+                            <div class="ui-decorator ui-bl"></div>
+                            <div class="ui-decorator ui-br"></div>
+                            <!-- Mock Data Visualization Lines -->
+                            <div style="width: 80%; height: 60%; position: relative;">
+                                <div
+                                    style="position:absolute; bottom:0; left:10%; width:1px; height:100%; background:var(--border-active);">
+                                </div>
+                                <div
+                                    style="position:absolute; bottom:0; left:30%; width:1px; height:60%; background:var(--border-active);">
+                                </div>
+                                <div
+                                    style="position:absolute; bottom:0; left:50%; width:1px; height:80%; background:var(--accent-red); box-shadow: 0 0 10px var(--accent-red);">
+                                </div>
+                                <div
+                                    style="position:absolute; bottom:0; left:70%; width:1px; height:40%; background:var(--border-active);">
+                                </div>
+                                <div
+                                    style="position:absolute; bottom:0; left:90%; width:1px; height:90%; background:var(--border-active);">
+                                </div>
+
+                                <div class="mono"
+                                    style="position:absolute; bottom: -25px; left:0; width:100%; display:flex; justify-content:space-between; color: var(--border-active); font-size: 0.6rem;">
+                                    <span>T-01</span><span>T-02</span><span class="text-red">T-03
+                                        [CRIT]</span><span>T-04</span><span>T-05</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CALL TO ACTION -->
+        <section id="cta">
+            <div class="container reveal-up">
+                <h2>Ready to explore partnership opportunities?</h2>
+                <p style="margin: 0 auto; margin-bottom: 2rem;">Initiate contact to discuss integrating sovereign
+                    protection grids into your operational framework.</p>
+
+                <form class="form-group"
+                    onsubmit="event.preventDefault(); window.location.href='mailto:hello@tropix.ai?subject=Partnership%20Inquiry';">
+                    <input type="text" class="form-input" placeholder="FULL NAME / CALLSIGN" required>
+                    <input type="email" class="form-input" placeholder="INSTITUTION EMAIL" required>
+                    <input type="text" class="form-input" placeholder="NATURE OF MISSION" required>
+                    <button type="submit" class="btn" style="width:100%; margin-top: 1rem;">Initialize Comms
+                        (hello@tropix.ai)</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-left">
+                <div class="logo" style="font-size: 1rem; margin-bottom: 0.5rem;">
+                    <span class="logo-mark" style="width:8px; height:8px;"></span>
+                    EPACE SOVEREIGN
+                </div>
+                <p>Sovereign protection for the world’s most critical operations.</p>
+                <p class="mono" style="font-size: 0.8rem; margin-top:1rem;">tropix.ai &copy; 2026</p>
+            </div>
+            <div class="footer-legal mono">
+                EPACE Sovereign is currently in advanced development. Not for unauthorized distribution.
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 1. ENTRANCE ANIMATION (3D ONTOLOGY SECURE BOOT) ---
+            const entCanvas = document.getElementById('entrance-canvas');
+            const eCtx = entCanvas.getContext('2d');
+            const skipBtn = document.getElementById('skip-btn');
+            let entranceSkipped = false;
+
+            let width, height;
+            let nodes = [];
+            const numNodes = 150;
+            const sphereRadius = 150;
+            
+            // Animation object for GSAP to tween
+            const state = {
+                rotationY: 0,
+                rotationX: 0,
+                scale: 0.1,
+                opacity: 0,
+                structureLerp: 0, // 0 = chaotic cloud, 1 = perfect sphere
+                lineDistance: 60,
+                burstScale: 0
+            };
+
+            function resizeEntrance() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                entCanvas.width = width;
+                entCanvas.height = height;
+            }
+            window.addEventListener('resize', resizeEntrance);
+            resizeEntrance();
+
+            // Initialize Nodes
+            for (let i = 0; i < numNodes; i++) {
+                // Golden ratio spiral for even distribution on sphere
+                const phi = Math.acos(1 - 2 * (i + 0.5) / numNodes);
+                const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+                
+                // Target spherical position
+                const tx = sphereRadius * Math.sin(phi) * Math.cos(theta);
+                const ty = sphereRadius * Math.sin(phi) * Math.sin(theta);
+                const tz = sphereRadius * Math.cos(phi);
+
+                // Initial chaotic position (spread out wide)
+                const ix = (Math.random() - 0.5) * 1200;
+                const iy = (Math.random() - 0.5) * 1200;
+                const iz = (Math.random() - 0.5) * 1200;
+
+                nodes.push({ ix, iy, iz, tx, ty, tz });
+            }
+
+            let renderLoop;
+
+            function drawEntrance() {
+                if (entranceSkipped) return;
+                eCtx.clearRect(0, 0, width, height);
+
+                eCtx.save();
+                eCtx.translate(width / 2, height / 2);
+                
+                // Apply scales
+                const currentScale = state.scale + state.burstScale;
+                eCtx.scale(currentScale, currentScale);
+
+                // Constant rotation
+                state.rotationY += 0.004;
+                state.rotationX += 0.002;
+
+                const cosY = Math.cos(state.rotationY);
+                const sinY = Math.sin(state.rotationY);
+                const cosX = Math.cos(state.rotationX);
+                const sinX = Math.sin(state.rotationX);
+
+                const projected = [];
+
+                // Transform and project nodes
+                for (let i = 0; i < numNodes; i++) {
+                    const n = nodes[i];
+                    
+                    // Lerp from chaos to structure
+                    const cx = n.ix + (n.tx - n.ix) * state.structureLerp;
+                    const cy = n.iy + (n.ty - n.iy) * state.structureLerp;
+                    const cz = n.iz + (n.tz - n.iz) * state.structureLerp;
+
+                    // Rotate Y
+                    let x1 = cx * cosY - cz * sinY;
+                    let z1 = cz * cosY + cx * sinY;
+                    let y1 = cy;
+
+                    // Rotate X
+                    let y2 = y1 * cosX - z1 * sinX;
+                    let z2 = z1 * cosX + y1 * sinX;
+                    let x2 = x1;
+
+                    // 3D Perspective Projection
+                    const fov = 800;
+                    const z = z2 + fov;
+                    if (z > 0) {
+                        const scale = fov / z;
+                        const px = x2 * scale;
+                        const py = y2 * scale;
+                        projected.push({ px, py, z: z2, scale: scale });
+                    }
+                }
+
+                // Sort by Z (painter's algorithm)
+                projected.sort((a, b) => b.z - a.z);
+
+                eCtx.globalAlpha = state.opacity;
+
+                // Draw connecting structural lines
+                eCtx.lineWidth = 1;
+                eCtx.beginPath();
+                for (let i = 0; i < projected.length; i++) {
+                    for (let j = i + 1; j < projected.length; j++) {
+                        const dx = projected[i].px - projected[j].px;
+                        const dy = projected[i].py - projected[j].py;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        // If they are close, draw a line. Scale distance threshold by structure to force connections later.
+                        if (dist < state.lineDistance * ((projected[i].scale + projected[j].scale)/2)) {
+                            eCtx.moveTo(projected[i].px, projected[i].py);
+                            eCtx.lineTo(projected[j].px, projected[j].py);
+                        }
+                    }
+                }
+                eCtx.strokeStyle = `rgba(255, 255, 255, ${0.1 + state.structureLerp * 0.15})`;
+                eCtx.stroke();
+
+                // Draw Nodes
+                projected.forEach(p => {
+                    const radius = Math.max(0.5, p.scale * (1.5 + state.structureLerp));
+                    // Dimmer if it's "behind" the sphere
+                    const brightness = Math.max(0.1, 1 - (p.z / sphereRadius) * 0.5);
+                    
+                    eCtx.fillStyle = `rgba(255, 255, 255, ${brightness * (0.3 + state.structureLerp * 0.7)})`;
+                    eCtx.beginPath();
+                    eCtx.arc(p.px, p.py, radius, 0, Math.PI * 2);
+                    eCtx.fill();
+                });
+
+                eCtx.restore();
+
+                renderLoop = requestAnimationFrame(drawEntrance);
+            }
+
+            renderLoop = requestAnimationFrame(drawEntrance);
+
+            // GSAP Sequence
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    cancelAnimationFrame(renderLoop);
+                    if (document.getElementById('entrance-overlay')) {
+                        document.getElementById('entrance-overlay').remove();
+                    }
+                    document.body.style.overflow = "auto";
+                    initMainPageAnimations();
+                }
+            });
+
+            document.body.style.overflow = "hidden";
+
+            // Boot Terminal Text
+            const terminalLines = [
+                "EPACE SOVEREIGN KERNEL v9.2.1 [SECURE BOOT]",
+                "INITIALIZING PROTECTIVE ENCLAVE...",
+                "LOADING ENCRYPTED TENANT NAMESPACE.",
+                "VERIFYING SHA-256 ISOLATION....... [ PASS ]",
+                "> ESTABLISHING AIRGAPPED HANDSHAKE.",
+                "> UPLINK SECURED.",
+                "DECRYPTING MASTER ONTOLOGY LATTICE..."
+            ];
+            
+            let termElem = document.getElementById('terminal-boot');
+            
+            // Show skip button quickly
+            gsap.delayedCall(1.5, () => {
+                if (!entranceSkipped) skipBtn.classList.add('visible');
+            });
+
+            tl.to(state, { opacity: 1, duration: 1, ease: 'power2.inOut' })
+              // Slow zoom in on the chaos cloud
+              .to(state, { scale: 0.8, duration: 3, ease: 'power2.out' }, 0)
+              // Terminal writing simulator
+              .to({}, { 
+                  duration: 2.5, 
+                  onUpdate: function() {
+                      const prog = this.progress();
+                      const linesToShow = Math.floor(prog * terminalLines.length);
+                      if (termElem) termElem.innerText = terminalLines.slice(0, linesToShow + 1).join("\n") + (Math.random() > 0.5 ? " _" : "");
+                  }
+              }, 0)
+              // Center ring pulse to signal lock-on
+              .to('#center-ring', { opacity: 1, scale: 1, duration: 1.5, ease: 'power2.out' }, "-=1.0")
+              // The snapping into geometric lattice (Ontology sync)
+              .to(state, { structureLerp: 1, duration: 2, ease: 'power4.inOut' }, "-=0.5")
+              .to(state, { lineDistance: 90, duration: 2, ease: 'power2.out' }, "-=2")
+              // Status text update when locked
+              .call(() => {
+                  if (termElem) termElem.innerText += "\n> [ LATTICE SYNC: 100% ]";
+                  document.getElementById('isr-status-text').style.display = "none";
+                  const th = document.getElementById('isr-threat-text');
+                  th.style.display = "block";
+                  th.style.color = "var(--text-main)";
+                  
+                  const ring = document.getElementById('center-ring');
+                  ring.style.borderColor = "var(--text-main)";
+                  ring.style.transform = "translate(-50%, -50%) scale(1.05)";
+                  ring.style.transition = "all 0.5s cubic-bezier(0.16, 1, 0.3, 1)";
+              })
+              // Hold for user to absorb the "Uplink Established" structure
+              .to({}, { duration: 1.2 })
+              // Big energetic warp pop outwards
+              .to(state, { burstScale: 20, opacity: 0, duration: 1.5, ease: 'power4.in' })
+              .to(['#isr-hud', '#terminal-boot', '#skip-btn'], { opacity: 0, duration: 0.5 }, "-=1")
+              // Reveal page content underneath
+              .set('#main-content', { visibility: 'visible' }, "-=0.5")
+              .to('#main-content', { opacity: 1, duration: 1.5, ease: 'power2.out' }, "-=0.5");
+
+            // Key/Click handlers
+            const doSkip = () => {
+                if (entranceSkipped) return;
+                entranceSkipped = true;
+                tl.kill();
+                cancelAnimationFrame(renderLoop);
+                gsap.to('#entrance-overlay', {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => {
+                        if (document.getElementById('entrance-overlay')) {
+                            document.getElementById('entrance-overlay').remove();
+                        }
+                        document.body.style.overflow = "auto";
+                        gsap.set('#main-content', { visibility: 'visible', opacity: 1 });
+                        initMainPageAnimations();
+                    }
+                });
+            };
+
+            skipBtn.addEventListener('click', doSkip);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && skipBtn.classList.contains('visible')) {
+                    doSkip();
+                }
+            });
+
+            // --- 2. MAIN PAGE ANIMATIONS ---
+            function initMainPageAnimations() {
+                // Hero Canvas Background (Pulsing Ontology Graph)
+                const hCanvas = document.getElementById('hero-canvas');
+                const hCtx = hCanvas.getContext('2d');
+                hCanvas.width = window.innerWidth;
+                hCanvas.height = window.innerHeight;
+
+                let hNodes = [];
+                for (let i = 0; i < 50; i++) {
+                    hNodes.push({
+                        x: Math.random() * hCanvas.width,
+                        y: Math.random() * hCanvas.height,
+                        vx: (Math.random() - 0.5) * 0.1,
+                        vy: (Math.random() - 0.5) * 0.1
+                    });
+                }
+
+                function drawHeroBg() {
+                    hCtx.clearRect(0, 0, hCanvas.width, hCanvas.height);
+                    hCtx.lineWidth = 0.5;
+                    hCtx.strokeStyle = 'rgba(255,255,255,0.05)';
+                    hCtx.fillStyle = 'rgba(255,255,255,0.1)';
+
+                    for (let i = 0; i < hNodes.length; i++) {
+                        hNodes[i].x += hNodes[i].vx;
+                        hNodes[i].y += hNodes[i].vy;
+
+                        // Bounce bounds
+                        if (hNodes[i].x < 0 || hNodes[i].x > hCanvas.width) hNodes[i].vx *= -1;
+                        if (hNodes[i].y < 0 || hNodes[i].y > hCanvas.height) hNodes[i].vy *= -1;
+
+                        hCtx.beginPath();
+                        hCtx.arc(hNodes[i].x, hNodes[i].y, 1.5, 0, Math.PI * 2);
+                        hCtx.fill();
+
+                        for (let j = i + 1; j < hNodes.length; j++) {
+                            const dx = hNodes[i].x - hNodes[j].x;
+                            const dy = hNodes[i].y - hNodes[j].y;
+                            if (dx * dx + dy * dy < 150 * 150) {
+                                hCtx.beginPath();
+                                hCtx.moveTo(hNodes[i].x, hNodes[i].y);
+                                hCtx.lineTo(hNodes[j].x, hNodes[j].y);
+                                hCtx.stroke();
+                            }
+                        }
+                    }
+                    requestAnimationFrame(drawHeroBg);
+                }
+                drawHeroBg();
+
+                // Scroll Trigger reveals
+                gsap.utils.toArray('.reveal-up').forEach((elem) => {
+                    ScrollTrigger.create({
+                        trigger: elem,
+                        start: 'top 85%',
+                        onEnter: () => gsap.to(elem, { opacity: 1, y: 0, duration: 1, ease: 'power3.out' })
+                    });
+                });
+            }
+
+            // Global Key handler for Enter=Skip
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && document.getElementById('entrance-overlay') && skipBtn.classList.contains('visible')) {
+                    skipBtn.click();
+                }
+            });
+
+        });
+    </script>
+</body>
+
+</html>
